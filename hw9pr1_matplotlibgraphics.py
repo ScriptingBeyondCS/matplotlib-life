@@ -93,5 +93,3 @@ def on_return(event):
     global reset
     if event.key == 'enter':
         reset = True
-
-start()
