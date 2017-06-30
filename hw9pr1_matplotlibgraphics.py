@@ -13,10 +13,12 @@ import matplotlib.animation as animation
 
 #summary of keypresses
 print(" PAUSE/PLAY: spacebar")
+print(" RESET: 'Enter'/'Return' ")
 print(" Start with start()")
 print()
 
 paused = False
+reset = False
 ON = 1
 OFF = 0
 
@@ -25,15 +27,17 @@ def start(width=20, height=20):
     global grid
     global mat
     global fig
+
     board = randomCells(width, height)
     # board is a list of lists; what students' functions interact with 
     grid = np.array(board)
-    assert type(grid) == np.ndarray
     # grid is numpy.ndarray; what matplotlib interacts with
 
     fig, ax = plt.subplots()
     cid = fig.canvas.mpl_connect('button_press_event', on_click)
     cid2 = fig.canvas.mpl_connect('key_press_event', on_space)
+    cid3 = fig.canvas.mpl_connect('key_press_event', on_return)
+
     mat = ax.matshow(grid)
     ani = animation.FuncAnimation(fig, update, interval=50, save_count=50)
     plt.show()
@@ -44,7 +48,13 @@ def update(data):
         shows changed cells when not paused
     """
     global grid
-    if not paused:  
+    global reset
+    if reset:
+        board = randomCells(20, 20)
+        grid = np.array(board)
+        reset = False
+        newGrid = grid.copy()
+    elif not paused:  
         board = grid.tolist() # turn np.ndarray into list of lists 
         newBoard = next_life_generation(board) 
         newGrid = np.array(newBoard)
@@ -74,5 +84,14 @@ def on_space(event):
     global paused
     if event.key == ' ':
         paused = not paused
+
+
+def on_return(event):
+    """ resets to a random board when
+        return is pressed
+    """
+    global reset
+    if event.key == 'enter':
+        reset = True
 
 start()
