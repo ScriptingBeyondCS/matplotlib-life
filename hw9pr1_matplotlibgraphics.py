@@ -10,11 +10,12 @@ from hw9pr1 import next_life_generation, randomCells
 import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib.animation as animation
+from matplotlib import colors
 
 #summary of keypresses
 print(" PAUSE/PLAY: spacebar")
+print(" (next) STEP: n")
 print(" RESET: 'Enter'/'Return' ")
-print(" Start with start()")
 print()
 
 paused = False
@@ -38,7 +39,11 @@ def start(width=20, height=20):
     cid2 = fig.canvas.mpl_connect('key_press_event', on_space)
     cid3 = fig.canvas.mpl_connect('key_press_event', on_return)
 
-    mat = ax.matshow(grid)
+    cmap = colors.ListedColormap(['xkcd:light navy blue','xkcd:celery'])
+    bounds = [-.5, .5, 1.5]
+    norm = colors.BoundaryNorm(bounds, cmap.N)
+
+    mat = ax.matshow(grid, cmap=cmap, norm=norm)
     ani = animation.FuncAnimation(fig, update, interval=50, save_count=50)
     plt.show()
 
@@ -60,6 +65,7 @@ def update(data):
         newGrid = np.array(newBoard)
     else:
         cid = fig.canvas.mpl_connect('button_press_event', on_click)
+        cid4 = fig.canvas.mpl_connect('key_press_event', on_step)
         newGrid = grid.copy()
     # update data
     mat.set_data(newGrid)
@@ -93,3 +99,16 @@ def on_return(event):
     global reset
     if event.key == 'enter':
         reset = True
+
+def on_step(event):
+    """ steps forward once
+        when 'n' is pressed
+    """
+    global grid
+    if event.key == 'n':
+        board = grid.tolist() # turn np.ndarray into list of lists 
+        newBoard = next_life_generation(board) 
+        newGrid = np.array(newBoard)
+        grid = newGrid
+
+start()
