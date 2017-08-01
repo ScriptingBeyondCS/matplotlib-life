@@ -45,6 +45,7 @@ def start(width=20, height=20):
 
     mat = ax.matshow(grid, cmap=cmap, norm=norm)
     ani = animation.FuncAnimation(fig, update, interval=50, save_count=50)
+    plt.axis('off')
     plt.show()
 
 
